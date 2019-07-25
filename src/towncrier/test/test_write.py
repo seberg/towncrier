@@ -96,7 +96,8 @@ Old text.
             ".. towncrier release notes start\n",
             "MyProject 1.0\n=============\n",
             render_fragments(
-                template, None, fragments, definitions, ["-", "~"], wrap=True
+                template, None, fragments, definitions, ["-", "~"], wrap=True,
+                name="", version="", project_date=""
             ),
         )
 
@@ -204,7 +205,8 @@ Old text.
             ".. towncrier release notes start\n",
             "MyProject 1.0\n=============\n",
             render_fragments(
-                template, None, fragments, definitions, ["-", "~"], wrap=True
+                template, None, fragments, definitions, ["-", "~"], wrap=True,
+                name="", version="", project_date=""
             ),
         )
 

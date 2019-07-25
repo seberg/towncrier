@@ -127,7 +127,8 @@ Bugfixes
 
         fragments = split_fragments(fragments, definitions)
         output = render_fragments(
-            template, None, fragments, definitions, ["-", "~"], wrap=True
+            template, None, fragments, definitions, ["-", "~"], wrap=True,
+            name="", version="", project_date=""
         )
         self.assertEqual(output, expected_output)
 
@@ -165,7 +166,8 @@ Bugfixes
         )
 
         output = render_fragments(
-            template, None, fragments, definitions, ["*", "^"], wrap=True
+            template, None, fragments, definitions, ["*", "^"], wrap=True,
+            name="", version="", project_date=""
         )
         self.assertEqual(output, expected_output_weird_underlines)
 
@@ -204,7 +206,8 @@ Misc
 
         fragments = split_fragments(fragments, definitions)
         output = render_fragments(
-            template, u"xx{issue}", fragments, definitions, ["-", "~"], wrap=True
+            template, u"xx{issue}", fragments, definitions, ["-", "~"], wrap=True,
+            name="", version="", project_date=""
         )
         self.assertEqual(output, expected_output)
 
@@ -256,7 +259,8 @@ Features
 
         fragments = split_fragments(fragments, definitions)
         output = render_fragments(
-            template, None, fragments, definitions, ["-", "~"], wrap=True
+            template, None, fragments, definitions, ["-", "~"], wrap=True,
+            name="", version="", project_date=""
         )
         self.assertEqual(output, expected_output)
 
@@ -301,6 +305,7 @@ Features
 
         fragments = split_fragments(fragments, definitions)
         output = render_fragments(
-            template, None, fragments, definitions, ["-", "~"], wrap=False
+            template, None, fragments, definitions, ["-", "~"], wrap=False,
+            name="", version="", project_date=""
         )
         self.assertEqual(output, expected_output)

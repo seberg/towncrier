@@ -11,20 +11,30 @@ from __future__ import absolute_import, division
 import os
 
 
-def append_to_newsfile(directory, filename, start_line, top_line, content):
+def append_to_newsfile(directory, filename, start_line, top_line, content,
+                       single_file=True):
 
     news_file = os.path.join(directory, filename)
 
-    if not os.path.exists(news_file):
-        existing_content = u""
+    if single_file:
+        if not os.path.exists(news_file):
+            existing_content = u""
+        else:
+            with open(news_file, "rb") as f:
+                existing_content = f.read().decode("utf8")
+
+        existing_content = existing_content.split(start_line, 1)
+
+        # If top line is used (not empty string), perform sanity check
+        if top_line and existing_content[-1].startswith(top_line):
+            raise ValueError("It seems you've already produced newsfiles for this version?")
+
     else:
-        with open(news_file, "rb") as f:
-            existing_content = f.read().decode("utf8")
+        if start_line is not None:
+            raise ValueError("`start_line` is not supported in single file mode.")
 
-    existing_content = existing_content.split(start_line, 1)
-
-    if top_line in existing_content:
-        raise ValueError("It seems you've already produced newsfiles for this version?")
+        # In single file mode, always overwrite any existing content.
+        existing_content = [""]
 
     with open(os.path.join(directory, filename), "wb") as f:
 

@@ -98,8 +98,7 @@ def indent(text, prefix):
 # Takes the output from find_fragments above. Probably it would be useful to
 # add an example output here. Next time someone digs deep enough to figure it
 # out, please do so...
-def split_fragments(fragments, definitions):
-
+def split_fragments(fragments, definitions, indent_fragments=True):
     output = OrderedDict()
 
     for section_name, section_fragments in fragments.items():
@@ -107,7 +106,10 @@ def split_fragments(fragments, definitions):
 
         for (ticket, category, counter), content in section_fragments.items():
 
-            content = indent(content.strip(), u"  ")[2:]
+            if indent_fragments:
+                content = indent(content.strip(), u"  ")[2:]
+            else:
+                content = content.strip()
 
             if definitions[category]["showcontent"] is False:
                 content = u""
@@ -143,6 +145,8 @@ def entry_key(entry):
 
 
 def render_issue(issue_format, issue):
+    if issue_format is False:
+        return None
     if issue_format is None:
         try:
             int(issue)
@@ -153,7 +157,8 @@ def render_issue(issue_format, issue):
         return issue_format.format(issue=issue)
 
 
-def render_fragments(template, issue_format, fragments, definitions, underlines, wrap):
+def render_fragments(template, issue_format, fragments, definitions, underlines,
+                     wrap, name, version, project_date, indent_fragments=True):
     """
     Render the fragments into a news file.
     """
@@ -198,7 +203,8 @@ def render_fragments(template, issue_format, fragments, definitions, underlines,
     done = []
 
     res = jinja_template.render(
-        sections=data, definitions=definitions, underlines=underlines
+        sections=data, definitions=definitions, underlines=underlines,
+        name=name, version=version, project_date=project_date,
     )
 
     for line in res.split(u"\n"):
@@ -207,7 +213,7 @@ def render_fragments(template, issue_format, fragments, definitions, underlines,
                 textwrap.fill(
                     line,
                     width=79,
-                    subsequent_indent=u"  ",
+                    subsequent_indent=u"  " * indent_fragments,
                     break_long_words=False,
                     break_on_hyphens=False,
                 )

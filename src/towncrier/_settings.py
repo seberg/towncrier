@@ -63,17 +63,29 @@ def parse_toml(config):
         else:
             wrap = False
 
+    single_file = config.get("single_file", False)
+    if not isinstance(single_file, bool):
+        raise ValueError("`single_file` option must be a boolean: false or true.")
+
+    indent_fragments = config.get("indent_fragments", True)
+    if not isinstance(indent_fragments, bool):
+        raise ValueError("`indent_fragments` must be boolean: false or true.")
+
+    start_string = None if not single_file else _start_string
+
     return {
         "package": config.get("package", ""),
         "package_dir": config.get("package_dir", "."),
+        "single_file": single_file,
         "filename": config.get("filename", "NEWS.rst"),
         "directory": config.get("directory"),
         "sections": sections,
         "types": types,
         "template": config.get("template", _template_fname),
-        "start_line": config.get("start_string", _start_string),
+        "start_line": config.get("start_string", start_string),
         "title_format": config.get("title_format", _title_format),
         "issue_format": config.get("issue_format"),
         "underlines": config.get("underlines", _underlines),
         "wrap": wrap,
+        "indent_fragments": indent_fragments,
     }

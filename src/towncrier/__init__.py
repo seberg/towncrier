@@ -89,18 +89,6 @@ def __main(draft, directory, project_name, project_version, project_date, answer
         base_directory, config["sections"], fragment_directory, definitions
     )
 
-    click.echo("Rendering news fragments...", err=to_err)
-    fragments = split_fragments(fragments, definitions)
-    rendered = render_fragments(
-        # The 0th underline is used for the top line
-        template,
-        config["issue_format"],
-        fragments,
-        definitions,
-        config["underlines"][1:],
-        config["wrap"],
-    )
-
     if project_version is None:
         project_version = get_version(
             os.path.join(directory, config["package_dir"]), config["package"]
@@ -119,10 +107,29 @@ def __main(draft, directory, project_name, project_version, project_date, answer
     if project_date is None:
         project_date = _get_date()
 
-    top_line = config["title_format"].format(
-        name=project_name, version=project_version, project_date=project_date
+    click.echo("Rendering news fragments...", err=to_err)
+    fragments = split_fragments(fragments, definitions, config["indent_fragments"])
+    rendered = render_fragments(
+        # The 0th underline is used for the top line
+        template,
+        config["issue_format"],
+        fragments,
+        definitions,
+        config["underlines"][1:],
+        config["wrap"],
+        name=project_name,
+        version=project_version,
+        project_date=project_date,
+        indent_fragments=config["indent_fragments"],
     )
-    top_line += u"\n" + (config["underlines"][0] * len(top_line)) + u"\n"
+
+    if config["title_format"] is False:
+        top_line = u""
+    else:
+        top_line = config["title_format"].format(
+            name=project_name, version=project_version, project_date=project_date
+        )
+        top_line += u"\n" + (config["underlines"][0] * len(top_line)) + u"\n"
 
     if draft:
         click.echo(
@@ -134,12 +141,20 @@ def __main(draft, directory, project_name, project_version, project_date, answer
     else:
         click.echo("Writing to newsfile...", err=to_err)
         start_line = config["start_line"]
+        news_file = config["filename"]
+        if not config["single_file"]:
+            news_file = news_file.format(
+                name=project_name,
+                version=project_version,
+                project_date=project_date,
+            )
         append_to_newsfile(
-            directory, config["filename"], start_line, top_line, rendered
+            directory, news_file, start_line, top_line, rendered,
+            single_file=config["single_file"]
         )
 
         click.echo("Staging newsfile...", err=to_err)
-        stage_newsfile(directory, config["filename"])
+        stage_newsfile(directory, news_file)
 
         click.echo("Removing news fragments...", err=to_err)
         remove_files(fragment_filenames, answer_yes)
